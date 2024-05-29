@@ -69,7 +69,7 @@ export default function Index() {
           height: 600,
         }}
       >
-        <Image resizeMode="cover" style={{ width:'95%', height:'100%',borderRadius:10 }} source={{ uri : `${image_base_url}${movies[2].poster_path}` }}/>
+        {/* <Image resizeMode="cover" style={{ width:'95%', height:'100%',borderRadius:10 }} source={{ uri : `${image_base_url}${movies[2].poster_path}` }}/> */}
       </View>
       <View style={{ flex: 1, flexDirection: "row",position:'relative',bottom:"15%",marginHorizontal:20 }}>
         <TouchableOpacity style={styles.main_card_btn}>
