@@ -1,70 +1,119 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+export interface Movies {
+  adult: boolean;
+  backdrop_path: string;
+  genre_ids: number[];
+  id: number;
+  original_language: string;
+  original_title: string;
+  overview: string;
+  popularity: number;
+  poster_path: string;
+  release_date: Date;
+  title: string;
+  video: boolean;
+  vote_average: number;
+  vote_count: number;
+}
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import {
+  ScrollView,
+  Text,
+  View,
+  StyleSheet,
+  FlatList,
+  Image,
+  TouchableOpacity,
+} from "react-native";
+import { Colors } from "@/constants/Colors";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { ThemedText } from "@/components/ThemedText";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { Ionicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+export default function Index() {
+  console.log(process.env.TMDB_API_KEY)
 
-export default function HomeScreen() {
+  useEffect(() => {
+    fetchData();
+  }, []);
+  const [movies, setmovies] = useState<Movies[]>([]);
+  const url = process.env.TMDB_API_KEY;
+  const apiKey = "841097b9785ec9f2ff65194fd73be11c";
+  const apiToken = process.env.TMDB_API_TOKEN
+
+  let image_base_url = "https://image.tmdb.org/t/p/original";
+  const fetchData = () => {
+    axios
+      .get(`${url}?api_key=${apiKey}`)
+      .then((res) => {
+        // console.log(res.data);
+        console.log(res.data.results[0].title);
+        setmovies(res.data.results);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const colorScheme = useColorScheme();
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <ScrollView>
+      {/* <Text style={{ color: Colors[colorScheme ?? "light"].text }}>Hello</Text> */}
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          margin: 5,
+          height: 600,
+        }}
+      >
+        <Image resizeMode="cover" style={{ width:'95%', height:'100%',borderRadius:10 }} source={{ uri : `${image_base_url}${movies[2].poster_path}` }}/>
+      </View>
+      <View style={{ flex: 1, flexDirection: "row",position:'relative',bottom:"15%",marginHorizontal:20 }}>
+        <TouchableOpacity style={styles.main_card_btn}>
+          <Ionicons name="play" size={24} color="black" />
+          <Text>Play</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.main_card_btn,{backgroundColor:Colors["dark"].background }]}
+        >
+          <Ionicons name="add" size={24} color={Colors[colorScheme ?? "light"].text }/>
+          <Text style={{ color : Colors[colorScheme ?? "light"].text }}>My List</Text>
+        </TouchableOpacity>
+      </View>
+      <FlatList
+        showsHorizontalScrollIndicator={false}
+        data={movies}
+        renderItem={({ item }) => (
+          <View style={{ margin: 4 }}>
+            <Image
+              style={{ width: 120, height: 170, borderRadius: 5 }}
+              source={{ uri: `${image_base_url}${item.poster_path}` }}
+            />
+          </View>
+        )}
+        horizontal={true}
+      ></FlatList>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    color: "white",
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  main_card_btn: {
+    backgroundColor: "white",
+    padding: 10,
+    width: "50%",
+    marginHorizontal: 10,
+    flex: 1,
+    flexDirection: "row",
+    alignContent: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius:5
   },
 });
